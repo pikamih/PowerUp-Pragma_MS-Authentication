@@ -3,15 +3,19 @@ package co.com.pragma.api.controller;
 import co.com.pragma.api.dto.request.UserRequestDto;
 import co.com.pragma.api.dto.response.UserResponseDto;
 import co.com.pragma.api.mapper.UserWebMapper;
-import co.com.pragma.model.user.User;
 import co.com.pragma.usecase.user.UserUseCase;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -19,24 +23,27 @@ import java.util.UUID;
 public class UserController {
 
     private final UserUseCase userUseCase;
+    private final UserWebMapper userWebMapper;
 
+    @PreAuthorize("hasAuthority('ADMIN','ASESOR')")
     @PostMapping
-    public Mono<ResponseEntity<UserResponseDto>> createUser(@RequestBody UserRequestDto dto) {
-        User userDomain = UserWebMapper.toDomain(dto);
-        return userUseCase.createUser(userDomain)
-                .map(savedUser -> ResponseEntity.ok(UserWebMapper.toResponse(savedUser)));
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<UserResponseDto> createUser(@Valid @RequestBody UserRequestDto dto) {
+        return userUseCase.createUser(userWebMapper.toDomain(dto))
+                .map(userWebMapper::toResponse);
     }
 
+
+
     @GetMapping
-    public Mono<ResponseEntity<Flux<UserResponseDto>>> getAllUsers() {
-        Flux<UserResponseDto> usersFlux = userUseCase.getAllUsers()
-                .map(UserWebMapper::toResponse);
-        return Mono.just(ResponseEntity.ok(usersFlux));
+    public Flux<UserResponseDto> getAllUsers() {
+        return userUseCase.listUsers()
+                .map(userWebMapper::toResponse);
     }
 
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<UserResponseDto>> getUserById(@PathVariable("id") String id) {
+    public Mono<UserResponseDto> getUserById(@PathVariable("id") String id) {
         UUID userId;
         try {
             userId = UUID.fromString(id);
@@ -45,11 +52,11 @@ public class UserController {
         }
 
         return userUseCase.getUserById(userId)
-                .map(user -> ResponseEntity.ok(UserWebMapper.toResponse(user)));
+                .map(userWebMapper::toResponse);
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<UserResponseDto>> updateUser(@PathVariable("id") String id,
+    public Mono<UserResponseDto>  updateUser(@PathVariable("id") String id,
                                                             @RequestBody UserRequestDto dto) {
         UUID userId;
         try {
@@ -58,12 +65,12 @@ public class UserController {
             return Mono.error(new IllegalArgumentException("Invalid UUID format"));
         }
 
-        User userDomain = UserWebMapper.toDomain(dto);
-        return userUseCase.updateUser(userId, userDomain)
-                .map(updatedUser -> ResponseEntity.ok(UserWebMapper.toResponse(updatedUser)));
+        return userUseCase.updateUser(userId, userWebMapper.toDomain(dto))
+                .map(userWebMapper::toResponse);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<ResponseEntity<String>> deleteUser(@PathVariable("id") String id) {
         UUID userId;
         try {

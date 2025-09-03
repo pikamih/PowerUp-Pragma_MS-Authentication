@@ -6,50 +6,52 @@ import co.com.pragma.r2dbc.entity.RoleEntity;
 import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.pragma.r2dbc.mapper.RoleEntityMapper;
 import co.com.pragma.r2dbc.RoleReactiveRepository;
+import lombok.RequiredArgsConstructor;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Flux;
 
 import java.util.UUID;
 
 @Repository
-@Primary
-public class RoleReactiveRepositoryAdapter
-        extends ReactiveAdapterOperations<Role, RoleEntity, UUID, RoleReactiveRepository>
-        implements RoleRepository {
+@RequiredArgsConstructor
+public class RoleReactiveRepositoryAdapter implements RoleRepository {
 
-    public RoleReactiveRepositoryAdapter(RoleReactiveRepository repository, ObjectMapper mapper) {
-        super(repository, mapper, RoleEntityMapper::toRole);
-    }
+    private final RoleReactiveRepository roleRepository;
+    private final TransactionalOperator transactionalOperator;
+    private final RoleEntityMapper roleEntityMapper;
 
     @Override
     public Mono<Role> save(Role role) {
-        return repository.save(RoleEntityMapper.fromRole(role))
-                .map(RoleEntityMapper::toRole);
+        return transactionalOperator
+                .execute(status -> roleRepository.save(roleEntityMapper.toEntity(role)))
+                .map(roleEntityMapper::toDomain)
+                .single();
     }
 
     @Override
     public Mono<Role> findById(UUID id) {
-        return repository.findById(id)
-                .map(RoleEntityMapper::toRole);
+        return roleRepository.findById(id)
+                .map(roleEntityMapper::toDomain);
     }
 
     @Override
     public Mono<Role> findByName(String name) {
-        return repository.findByName(name)
-                .map(RoleEntityMapper::toRole);
+        return roleRepository.findByName(name)
+                .map(roleEntityMapper::toDomain);
     }
 
     @Override
     public Flux<Role> findAll() {
-        return repository.findAll()
-                .map(RoleEntityMapper::toRole);
+        return roleRepository.findAll()
+                .map(roleEntityMapper::toDomain);
     }
 
     @Override
     public Mono<Void> deleteById(UUID id) {
-        return repository.deleteById(id);
+        return roleRepository.deleteById(id);
     }
 }

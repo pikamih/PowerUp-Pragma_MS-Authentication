@@ -1,5 +1,6 @@
 package co.com.pragma.api.dto.response;
 
+import co.com.pragma.model.role.Role;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,7 +24,7 @@ public class UserResponseDto {
     private String phone;
     private String email;
     private Double baseSalary;
-    private UUID roleId;
+    private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

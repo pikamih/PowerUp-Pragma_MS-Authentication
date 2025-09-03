@@ -1,5 +1,6 @@
 package co.com.pragma.r2dbc.entity;
 
+import co.com.pragma.model.role.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,6 +28,7 @@ public class UserEntity {
     private String address;
     private String phone;
     private String email;
+    private String password;
     private Double baseSalary;
     private UUID roleId;
     private LocalDateTime createdAt;

@@ -1,7 +1,10 @@
 package co.com.pragma.api.handler;
 
+import co.com.pragma.api.dto.request.RoleRequestDto;
+import co.com.pragma.api.mapper.RoleWebMapper;
 import co.com.pragma.usecase.role.RoleUseCase;
 import co.com.pragma.model.role.Role;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -11,56 +14,64 @@ import reactor.core.publisher.Flux;
 import java.net.URI;
 import java.util.UUID;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
 @Component
+@RequiredArgsConstructor
 public class RoleHandler {
 
     private final RoleUseCase roleUseCase;
+    private final RoleWebMapper roleWebMapper;
 
-    public RoleHandler(RoleUseCase roleUseCase) {
-        this.roleUseCase = roleUseCase;
-    }
-
-    // Crear un rol
     public Mono<ServerResponse> createRole(ServerRequest request) {
-        return request.bodyToMono(Role.class)
-                .flatMap(roleUseCase::createRole)
-                .flatMap(role -> ServerResponse
-                        .created(URI.create("/api/v1/roles/" + role.getId()))
-                        .bodyValue(role))
-                .onErrorResume(e -> ServerResponse.badRequest()
-                        .bodyValue(e.getMessage()));
+        return request.bodyToMono(RoleRequestDto.class).flatMap(dto -> {
+            //Convertir a dominio
+            var roleDomain = roleWebMapper.toDomain(dto);
+            //Lamar al UseCase
+            return roleUseCase.createRole(roleDomain);
+        }).flatMap(savedRole -> ServerResponse.created(URI.create("/api/v1/roles/"))
+                .contentType(APPLICATION_JSON).bodyValue(roleWebMapper.toResponse(savedRole)));
     }
 
     // Obtener un rol por ID
     public Mono<ServerResponse> getRoleById(ServerRequest request) {
-        UUID id = UUID.fromString(request.pathVariable("id"));
-        return roleUseCase.getRoleById(id)
-                .flatMap(role -> ServerResponse.ok().bodyValue(role))
-                .switchIfEmpty(ServerResponse.notFound().build());
+        try {
+            UUID roleId = UUID.fromString(request.pathVariable("id"));
+            return roleUseCase.findByIdRole(roleId).flatMap(role -> ServerResponse.ok()
+                    .contentType(APPLICATION_JSON).bodyValue(roleWebMapper.toResponse(role)));
+        }catch (IllegalArgumentException e){
+            return ServerResponse.badRequest().bodyValue("Invalid UUID format: " + request.pathVariable("id"));
+        }
     }
 
     // Listar todos los roles
     public Mono<ServerResponse> listRoles(ServerRequest request) {
-        Flux<Role> roles = roleUseCase.listRoles();
-        return ServerResponse.ok().body(roles, Role.class);
+        return roleUseCase.listAllRoles().collectList().flatMap(role -> ServerResponse.ok()
+                .contentType(APPLICATION_JSON).bodyValue(role.stream().map(roleWebMapper::toResponse).toList()));
+
     }
 
     // Actualizar un rol
     public Mono<ServerResponse> updateRole(ServerRequest request) {
-        UUID id = UUID.fromString(request.pathVariable("id"));
-        return request.bodyToMono(Role.class)
-                .flatMap(role -> roleUseCase.updateRole(id, role))
-                .flatMap(updated -> ServerResponse.ok().bodyValue(updated))
-                .onErrorResume(e -> ServerResponse.badRequest()
-                        .bodyValue(e.getMessage()));
+        try {
+            UUID roleId = UUID.fromString(request.pathVariable("id"));
+            return request.bodyToMono(RoleRequestDto.class).flatMap(dto -> {
+                var roleDomain = roleWebMapper.toDomain(dto);
+                return roleUseCase.updateRole(roleId, roleDomain);
+            }).flatMap(updateRole -> ServerResponse.ok()
+                    .contentType(APPLICATION_JSON).bodyValue(roleWebMapper.toResponse(updateRole)));
+        } catch (IllegalArgumentException e){
+            return ServerResponse.badRequest().bodyValue("Invalid UUID format: " + request.pathVariable("id"));
+        }
     }
 
     // Eliminar un rol
     public Mono<ServerResponse> deleteRole(ServerRequest request) {
-        UUID id = UUID.fromString(request.pathVariable("id"));
-        return roleUseCase.deleteRole(id)
-                .then(ServerResponse.noContent().build())
-                .onErrorResume(e -> ServerResponse.badRequest()
-                        .bodyValue(e.getMessage()));
+        try {
+            UUID roleId = UUID.fromString(request.pathVariable("id"));
+            return roleUseCase.deleteRole(roleId).then(ServerResponse.noContent().build());
+        }catch (IllegalArgumentException e){
+            return ServerResponse.badRequest().bodyValue("Invalid UUID format: " + request.pathVariable("id"));
+        }
     }
 }
