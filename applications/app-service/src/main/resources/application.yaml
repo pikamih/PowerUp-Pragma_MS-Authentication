@@ -17,6 +17,11 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  security:
+    user:
+      name: admin
+      password: admin123
+
 management:
   endpoints:
     web:
@@ -27,9 +32,19 @@ management:
       probes:
         enabled: true
 
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+  paths-to-match: /api/v1/**
+
+
 security:
   jwt:
-    secret-key: ""
+    private-key-path: ${JWT_PRAGMA_PRIVATE_KEY_PATH}
+    public-key-path: ${JWT_PRAGMA_PUBLIC_KEY_PATH}
     expiration: 3600 #en segundos
 
 cors:

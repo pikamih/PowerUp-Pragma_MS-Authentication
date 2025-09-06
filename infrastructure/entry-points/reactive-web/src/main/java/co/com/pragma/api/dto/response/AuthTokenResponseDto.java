@@ -15,5 +15,5 @@ public class AuthTokenResponseDto {
     private String email;
     private String role;
     private String token;
-    private String expiresAt;
+    private Long expiresAt;
 }

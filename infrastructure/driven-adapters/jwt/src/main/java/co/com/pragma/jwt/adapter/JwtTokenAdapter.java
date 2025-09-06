@@ -1,6 +1,7 @@
 package co.com.pragma.jwt.adapter;
 
 import co.com.pragma.jwt.JwtService;
+import co.com.pragma.jwt.TokenWithExpiry;
 import co.com.pragma.model.authtoken.AuthToken;
 import co.com.pragma.model.authtoken.gateways.AuthTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,11 @@ public class JwtTokenAdapter implements AuthTokenRepository {
                         authToken.getEmail(),
                         authToken.getRole(),
                         authToken.getDocumentId())
-                .map(tokenStr -> authToken.toBuilder().token(tokenStr).build());
+                .map((TokenWithExpiry t) -> {
+                    authToken.setToken(t.token());
+                    authToken.setExpiresAt(String.valueOf(t.expiresAt()));
+                    return authToken;
+                });
     }
 
     @Override

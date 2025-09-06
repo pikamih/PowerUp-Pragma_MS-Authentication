@@ -9,8 +9,6 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AuthTokenWebMapper {
 
-
-
     AuthTokenResponseDto toResponse(AuthToken authToken);
 
 }

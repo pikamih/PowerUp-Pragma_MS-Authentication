@@ -1,11 +1,16 @@
 package co.com.pragma.config;
 
+import co.com.pragma.model.authcredential.gateways.PasswordHasher;
+import co.com.pragma.model.role.gateways.RoleRepository;
+import co.com.pragma.model.user.gateways.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 public class UseCasesConfigTest {
 
@@ -22,23 +27,27 @@ public class UseCasesConfigTest {
                 }
             }
 
-            assertTrue(useCaseBeanFound, "No beans ending with 'Use Case' were found");
+            assertTrue(useCaseBeanFound, "No beans ending with 'UseCase' were found");
         }
     }
 
-    @Configuration
+    @TestConfiguration
     @Import(UseCasesConfig.class)
     static class TestConfig {
 
         @Bean
-        public MyUseCase myUseCase() {
-            return new MyUseCase();
+        public RoleRepository roleRepository() {
+            return mock(RoleRepository.class);
         }
-    }
 
-    static class MyUseCase {
-        public String execute() {
-            return "MyUseCase Test";
+        @Bean
+        public UserRepository userRepository() {
+            return mock(UserRepository.class);
+        }
+
+        @Bean
+        public PasswordHasher passwordHasher() {
+            return mock(PasswordHasher.class);
         }
     }
 }

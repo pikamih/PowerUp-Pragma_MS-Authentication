@@ -124,7 +124,7 @@ public class UserUseCase {
                 .flatMap(existing ->
                         userRepository.existsByEmail(user.getEmail())
                                 .flatMap(duplicate -> {
-                                    if (!duplicate) {
+                                    if (duplicate) {
                                         return Mono.error(new BusinessException(MessageCode.USER_EMAIL_ALREADY_EXISTS, new Object[]{}));
                                     }
                                     return userRepository.existsByDocumentId(user.getDocumentId())

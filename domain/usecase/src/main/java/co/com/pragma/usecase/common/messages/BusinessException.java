@@ -13,4 +13,11 @@ public class BusinessException extends RuntimeException {
         this.code = code;
         this.params = params;
     }
+    public MessageCode getMessageCode() {
+        return code;
+    }
+
+    public Object[] getArgs() {
+        return params;
+    }
 }

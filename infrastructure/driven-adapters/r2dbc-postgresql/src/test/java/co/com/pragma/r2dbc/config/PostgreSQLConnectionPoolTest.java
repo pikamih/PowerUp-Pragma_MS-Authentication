@@ -1,5 +1,6 @@
 package co.com.pragma.r2dbc.config;
 
+import io.r2dbc.pool.ConnectionPool;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,13 +22,15 @@ class PostgreSQLConnectionPoolTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Usar los getters correctos
+        when(properties.getUrl()).thenReturn("r2dbc:postgresql://localhost:5432/authentication_db");
         when(properties.getUsername()).thenReturn("username");
         when(properties.getPassword()).thenReturn("password");
     }
 
     @Test
-    void getConnectionConfigSuccess() {
-        assertNotNull(connectionPool.getConnectionConfig(properties));
+    void getConnectionConfigBeanCreation() {
+        // Solo verificamos que el pool se cree, sin conectar a la DB real
+        ConnectionPool pool = connectionPool.getConnectionConfig(properties);
+        assertNotNull(pool);
     }
 }

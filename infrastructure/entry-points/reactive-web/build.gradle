@@ -2,6 +2,8 @@ dependencies {
     implementation project(':usecase')
     implementation project(':model')
     implementation project(':message-translator')
+    implementation project(':jwt')
+
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
@@ -10,4 +12,21 @@ dependencies {
 
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        // excluir versiones transitivas que podrían generar conflicto
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+    // Swagger / OpenAPI
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.7.0'
+
+    testImplementation "io.jsonwebtoken:jjwt-api:0.11.5"
+
+
+
+}
+
+test {
+    useJUnitPlatform()
 }

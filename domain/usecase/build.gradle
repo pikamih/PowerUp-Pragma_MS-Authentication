@@ -1,4 +1,13 @@
 dependencies {
     implementation project(':model')
 
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        // excluir versiones transitivas que podrían generar conflicto
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+
+
+}
+test {
+    useJUnitPlatform()
 }
