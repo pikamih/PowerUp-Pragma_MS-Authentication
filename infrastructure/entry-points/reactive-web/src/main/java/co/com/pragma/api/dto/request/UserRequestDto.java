@@ -1,5 +1,6 @@
 package co.com.pragma.api.dto.request;
 
+import co.com.pragma.model.role.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,11 +44,16 @@ public class UserRequestDto {
     @Size(max = 150, message = "El correo no debe exceder 150 caracteres")
     private String email;
 
+    @NotBlank(message = "La contraseña no puede estar vacía")
+    @Size(min = 8, max = 32, message = "La contraseña debe tener entre 8 y 32 caracteres")
+    private String password;
+
+
     @NotNull(message = "El salario base es obligatorio")
     @DecimalMin(value = "0.0", inclusive = true, message = "El salario debe ser mayor o igual a 0")
     @DecimalMax(value = "15000000.0", inclusive = true, message = "El salario no debe exceder 15,000,000")
     private Double baseSalary;
 
     @NotNull(message = "El rol es obligatorio")
-    private UUID roleId;
+    private Role role;
 }

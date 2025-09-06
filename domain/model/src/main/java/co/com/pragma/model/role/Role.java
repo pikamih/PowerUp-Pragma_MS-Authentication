@@ -10,7 +10,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder        // <--- esto es lo que falta
+@Builder(toBuilder = true)
 public class Role {
     private UUID id;
     private String name;

@@ -11,7 +11,7 @@ import org.springframework.r2dbc.connection.R2dbcTransactionManager;
 public class DatabaseConfig {
 
     @Bean
-    public ReactiveTransactionManager transactionManager(ConnectionFactory connectionFactory) {
+    public ReactiveTransactionManager reactiveTransactionManager(ConnectionFactory connectionFactory) {
         return new R2dbcTransactionManager(connectionFactory);
     }
 

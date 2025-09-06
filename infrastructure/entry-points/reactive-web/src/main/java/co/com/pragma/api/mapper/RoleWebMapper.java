@@ -3,33 +3,20 @@ package co.com.pragma.api.mapper;
 import co.com.pragma.api.dto.request.RoleRequestDto;
 import co.com.pragma.api.dto.response.RoleResponseDto;
 import co.com.pragma.model.role.Role;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RoleWebMapper {
+@Component
+@Mapper(componentModel = "spring")
+public interface RoleWebMapper {
 
-    public static Role toDomain(RoleRequestDto dto) {
-        if (dto == null) return null;
-        return Role.builder()
-                .name(dto.getName())
-                .description(dto.getDescription())
-                .build();
-    }
+    @Mapping(target = "id", ignore = true)
+    Role toDomain(RoleRequestDto dto);
 
-    public static RoleResponseDto toResponse(Role role) {
-        if (role == null) return null;
-        return RoleResponseDto.builder()
-                .id(role.getId())
-                .name(role.getName())
-                .description(role.getDescription())
-                .build();
-    }
+    RoleResponseDto toResponse(Role role);
 
-    public static List<RoleResponseDto> toResponseList(List<Role> roles) {
-        if (roles == null) return List.of();
-        return roles.stream()
-                .map(RoleWebMapper::toResponse)
-                .collect(Collectors.toList());
-    }
 }

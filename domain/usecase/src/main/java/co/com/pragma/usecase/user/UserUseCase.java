@@ -1,124 +1,153 @@
 package co.com.pragma.usecase.user;
 
+import co.com.pragma.model.authcredential.gateways.PasswordHasher;
+import co.com.pragma.model.role.gateways.RoleRepository;
 import co.com.pragma.model.user.User;
 import co.com.pragma.model.user.gateways.UserRepository;
+import co.com.pragma.usecase.common.messages.BusinessException;
+import co.com.pragma.usecase.common.messages.MessageCode;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.regex.Pattern;
+import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class UserUseCase {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordHasher passwordHasher;
 
-    /**
-     * Crea un nuevo usuario validando los criterios de aceptación
-     */
     public Mono<User> createUser(User user) {
 
-        // Validaciones de campos obligatorios
-        if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("First name is required"));
+        // Validaciones
+        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_FIRST_NAME_REQUIRED, new Object[]{}));
         }
-        if (user.getLastName() == null || user.getLastName().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("Last name is required"));
+        if (user.getLastName() == null || user.getLastName().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_LAST_NAME_REQUIRED, new Object[]{}));
         }
-        if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            return Mono.error(new IllegalArgumentException("Email is required"));
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_EMAIL_REQUIRED, new Object[]{}));
+        }
+        if (user.getDocumentId() == null || user.getDocumentId().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_REQUIRED, new Object[]{}));
         }
         if (user.getBaseSalary() == null) {
-            return Mono.error(new IllegalArgumentException("Base salary is required"));
+            return Mono.error(new BusinessException(MessageCode.USER_BASE_SALARY_REQUIRED, new Object[]{}));
         }
-
-        // Validación de rango de salario
-        if (user.getBaseSalary() < 0 || user.getBaseSalary() > 15000000) {
-            return Mono.error(new IllegalArgumentException("Base salary must be between 0 and 15,000,000"));
+        if (user.getBaseSalary() < 0 || user.getBaseSalary() > 15_000_000) {
+            return Mono.error(new BusinessException(MessageCode.USER_BASE_SALARY_INVALID, new Object[]{}));
         }
 
         // Validación de formato de email
         Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
         if (!emailPattern.matcher(user.getEmail()).matches()) {
-            return Mono.error(new IllegalArgumentException("Email format is invalid"));
+            return Mono.error(new BusinessException(MessageCode.USER_EMAIL_INVALID, new Object[]{}));
         }
 
-        // Validación de email único
-        return userRepository.existsByEmail(user.getEmail())
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new IllegalArgumentException("Email already exists"));
-                    }
+        // Validar que el rol exista
+        if (user.getRole() == null || user.getRole().getName() == null || user.getRole().getName().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_ROLE_REQUIRED, new Object[]{}));
+        }
 
-                    // Asignar ID y timestamps
-                    User userToSave = user.toBuilder()
-                            .createdAt(LocalDateTime.now())
-                            .updatedAt(LocalDateTime.now())
-                            .build();
 
-                    return userRepository.save(userToSave);
-                });
+        String roleName = user.getRole().getName().toUpperCase();
+
+        return roleRepository.findByName(roleName)
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_ROLE_NOT_FOUND, new Object[]{})))
+                .flatMap(role ->
+                        userRepository.existsByEmail(user.getEmail())
+                                .flatMap(emailExists -> {
+                                    if (emailExists) {
+                                        return Mono.error(new BusinessException(MessageCode.USER_EMAIL_ALREADY_EXISTS, new Object[]{}));
+                                    }
+                                    return userRepository.existsByDocumentId(user.getDocumentId());
+                                })
+                                .flatMap(docExists -> {
+                                    if (docExists) {
+                                        return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_ALREADY_EXISTS, new Object[]{}));
+                                    }
+
+                                    System.out.println("passwordd: " + user);
+                                    String hashedPassword = passwordHasher.hash(user.getPassword());
+                                    user.setPassword(hashedPassword);
+                                    // Asignar el rol validado al usuario antes de guardar
+                                    user.setRole(role);
+                                    return userRepository.save(user);
+                                })
+                );
+
     }
 
-    // Otros métodos CRUD
-    public Mono<User> updateUser(UUID userId, User user) {
-        return userRepository.findById(userId)
-                .flatMap(existingUser -> {
-
-                    // Comparamos si hay cambios
-                    if (existingUser.equals(user)) {
-                        // No hay cambios, devolvemos mensaje personalizado
-                        return Mono.error(new IllegalStateException("El usuario ya está actualizado"));
-                    }
-
-                    // Validaciones de campos obligatorios
-                    if (user.getFirstName() == null || user.getFirstName().isEmpty()) {
-                        return Mono.error(new IllegalArgumentException("First name is required"));
-                    }
-                    if (user.getLastName() == null || user.getLastName().isEmpty()) {
-                        return Mono.error(new IllegalArgumentException("Last name is required"));
-                    }
-                    if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                        return Mono.error(new IllegalArgumentException("Email is required"));
-                    }
-                    if (user.getBaseSalary() == null) {
-                        return Mono.error(new IllegalArgumentException("Base salary is required"));
-                    }
-
-                    // Validación de formato de email
-                    Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
-                    if (!emailPattern.matcher(user.getEmail()).matches()) {
-                        return Mono.error(new IllegalArgumentException("Email format is invalid"));
-                    }
-
-                    // Asignar timestamps y mantener ID
-                    user.setId(existingUser.getId());
-                    user.setCreatedAt(existingUser.getCreatedAt());
-                    user.setUpdatedAt(LocalDateTime.now());
-
-                    // Llamada al repositorio para hacer UPDATE real
-                    return userRepository.update(user);
-                })
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Usuario no encontrado")));
+    public Mono<User> getUserById(UUID id) {
+        return userRepository.findById(id)
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{id})));
     }
 
+    public Flux<User> listUsers() {
+        return userRepository.findAll();
+    }
 
+    public Mono<User> updateUser(UUID id, User user) {
+        // Validaciones
+        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_FIRST_NAME_REQUIRED, new Object[]{}));
+        }
+        if (user.getLastName() == null || user.getLastName().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_LAST_NAME_REQUIRED, new Object[]{}));
+        }
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_EMAIL_REQUIRED, new Object[]{}));
+        }
+        if (user.getDocumentId() == null || user.getDocumentId().isBlank()) {
+            return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_REQUIRED, new Object[]{}));
+        }
+        if (user.getBaseSalary() == null) {
+            return Mono.error(new BusinessException(MessageCode.USER_BASE_SALARY_REQUIRED, new Object[]{}));
+        }
+        if (user.getBaseSalary() < 0 || user.getBaseSalary() > 15_000_000) {
+            return Mono.error(new BusinessException(MessageCode.USER_BASE_SALARY_INVALID, new Object[]{}));
+        }
 
+        Pattern emailPattern = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$");
+        if (!emailPattern.matcher(user.getEmail()).matches()) {
+            return Mono.error(new BusinessException(MessageCode.USER_EMAIL_INVALID, new Object[]{}));
+        }
+
+        return userRepository.findById(id)
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{id})))
+                .flatMap(existing ->
+                        userRepository.existsByEmail(user.getEmail())
+                                .flatMap(duplicate -> {
+                                    if (duplicate) {
+                                        return Mono.error(new BusinessException(MessageCode.USER_EMAIL_ALREADY_EXISTS, new Object[]{}));
+                                    }
+                                    return userRepository.existsByDocumentId(user.getDocumentId())
+                                            .flatMap(dupDoc -> {
+                                                if (dupDoc) {
+                                                    return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_ALREADY_EXISTS, new Object[]{}));
+                                                }
+                                                // Solo actualizamos lo permitido
+                                                existing.setFirstName(user.getFirstName());
+                                                existing.setLastName(user.getLastName());
+                                                existing.setEmail(user.getEmail());
+                                                existing.setDocumentId(user.getDocumentId());
+                                                existing.setBaseSalary(user.getBaseSalary());
+                                                existing.setUpdatedAt(LocalDateTime.now()); // se actualiza aquí
+                                                return userRepository.save(existing);
+                                            });
+                                })
+                );
+    }
 
     public Mono<Void> deleteUser(UUID id) {
         return userRepository.findById(id)
-                .flatMap(user -> userRepository.delete(id))
-                .switchIfEmpty(Mono.error(new IllegalArgumentException("Usuario no existe")));
-    }
-
-
-    public Mono<User> getUserById(UUID id) {
-        return userRepository.findById(id);
-    }
-
-    public Flux<User> getAllUsers() {
-        return userRepository.findAll();
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{id})))
+                .flatMap(existing -> userRepository.delete(id));
     }
 }
