@@ -6,7 +6,7 @@ spring:
     name: "MS_Authentication"
 
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/authentication_db
+    url: r2dbc:postgresql://db:5432/authentication_db
     username: postgres
     password: root
     pool:

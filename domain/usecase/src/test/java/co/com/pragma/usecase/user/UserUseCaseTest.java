@@ -174,13 +174,13 @@ class UserUseCaseTest {
     @Test
     void updateUser_emailAlreadyExists_shouldThrow() {
         User existing = UserMock.getDefault();
+
         User duplicate = UserMock.getWithCustomEmail("duplicate@example.com");
+        duplicate.setId(UUID.randomUUID()); // ✅ ID distinto
 
         when(userRepository.findById(existing.getId())).thenReturn(Mono.just(existing));
         when(userRepository.findByEmail(duplicate.getEmail()))
-                .thenReturn(Mono.just(UserMock.getWithCustomEmail("duplicate@example.com")));
-        when(userRepository.existsByEmail(duplicate.getEmail())).thenReturn(Mono.just(true));
-        when(userRepository.existsByDocumentId(duplicate.getDocumentId())).thenReturn(Mono.just(false));
+                .thenReturn(Mono.just(duplicate));
         when(roleRepository.findByName(duplicate.getRole().getName())).thenReturn(Mono.just(RoleMock.getDefault()));
 
         StepVerifier.create(useCase.updateUser(existing.getId(), duplicate))
@@ -190,6 +190,7 @@ class UserUseCaseTest {
                 })
                 .verify();
     }
+
 
     // ---------- DELETE ----------
     @Test
