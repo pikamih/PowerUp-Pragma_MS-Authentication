@@ -121,28 +121,42 @@ public class UserUseCase {
 
         return userRepository.findById(id)
                 .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{id})))
-                .flatMap(existing ->
-                        userRepository.existsByEmail(user.getEmail())
-                                .flatMap(duplicate -> {
-                                    if (duplicate) {
-                                        return Mono.error(new BusinessException(MessageCode.USER_EMAIL_ALREADY_EXISTS, new Object[]{}));
-                                    }
-                                    return userRepository.existsByDocumentId(user.getDocumentId())
-                                            .flatMap(dupDoc -> {
-                                                if (dupDoc) {
-                                                    return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_ALREADY_EXISTS, new Object[]{}));
-                                                }
-                                                // Solo actualizamos lo permitido
-                                                existing.setFirstName(user.getFirstName());
-                                                existing.setLastName(user.getLastName());
-                                                existing.setEmail(user.getEmail());
-                                                existing.setDocumentId(user.getDocumentId());
-                                                existing.setBaseSalary(user.getBaseSalary());
-                                                existing.setUpdatedAt(LocalDateTime.now()); // se actualiza aquí
-                                                return userRepository.save(existing);
-                                            });
-                                })
-                );
+                .flatMap(existing -> {
+                    // No se permite modificar el documentId
+                    if (!existing.getDocumentId().equals(user.getDocumentId())) {
+                        return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_CANNOT_BE_CHANGED, new Object[]{id}));
+                    }
+
+                    // Validación de email único (si cambió)
+                    return userRepository.findByEmail(user.getEmail())
+                            .flatMap(foundUser -> {
+                                if (!foundUser.getId().equals(existing.getId())) {
+                                    return Mono.error(new BusinessException(MessageCode.USER_EMAIL_ALREADY_EXISTS, new Object[]{user.getEmail()}));
+                                }
+                                return Mono.just(existing);
+                            })
+                            .switchIfEmpty(Mono.just(existing))
+                            .flatMap(u -> {
+                                // Validación de rol por nombre
+                                if (user.getRole() == null || user.getRole().getName() == null) {
+                                    return Mono.error(new BusinessException(MessageCode.USER_ROLE_REQUIRED, new Object[]{}));
+                                }
+
+                                return roleRepository.findByName(user.getRole().getName())
+                                        .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_ROLE_NOT_FOUND, new Object[]{user.getRole().getName()})))
+                                        .flatMap(role -> {
+                                            // Actualizamos solo campos permitidos
+                                            existing.setFirstName(user.getFirstName());
+                                            existing.setLastName(user.getLastName());
+                                            existing.setEmail(user.getEmail());
+                                            existing.setBaseSalary(user.getBaseSalary());
+                                            existing.setRole(role); // rol validado
+                                            existing.setUpdatedAt(LocalDateTime.now());
+
+                                            return userRepository.save(existing);
+                                        });
+                            });
+                });
     }
 
     public Mono<Void> deleteUser(UUID id) {

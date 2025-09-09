@@ -72,45 +72,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
-        HttpStatus status;
-
-        switch (ex.getCode()) {
-            // ===== Campos requeridos =====
-            case USER_FIRST_NAME_REQUIRED,
-                 USER_LAST_NAME_REQUIRED,
-                 USER_EMAIL_REQUIRED,
-                 USER_DOCUMENT_ID_REQUIRED,
-                 USER_BASE_SALARY_REQUIRED,
-                 ROLE_NAME_REQUIRED ->
-                    status = HttpStatus.BAD_REQUEST;
-
-            // ===== Validaciones de formato/rango =====
-            case USER_BASE_SALARY_INVALID,
-                 USER_EMAIL_INVALID,
-                 USER_ROLE_REQUIRED,
-                 USER_INVALID_PASSWORD,
-                 USER_PASSWORD_REQUIRED ->
-                    status = HttpStatus.BAD_REQUEST;
-
-            // ===== Conflictos de unicidad =====
-            case USER_EMAIL_ALREADY_EXISTS,
-                 USER_DOCUMENT_ID_ALREADY_EXISTS,
-                 ROLE_ALREADY_EXISTS ->
-                    status = HttpStatus.CONFLICT;
-
-            // ===== Recurso no encontrado =====
-            case USER_NOT_FOUND_BY_ID,
-                 ROLE_NOT_FOUND_BY_ID,
-                 USER_ROLE_NOT_FOUND,
-                 USER_NOT_FOUND_BY_EMAIL ->
-                    status = HttpStatus.NOT_FOUND;
-
-            // =======Unauthorized=======
-            case USER_NOT_AUTHORIZED ->
-                    status = HttpStatus.UNAUTHORIZED;
-            // ===== Fallback =====
-            default -> status = HttpStatus.INTERNAL_SERVER_ERROR;
-        }
+        HttpStatus status =
+                HttpStatus.valueOf(ex.getCode().getHttpStatus());
 
         // Traduce el mensaje con parámetros
         String message = translator.translate(ex.getCode(), ex.getParams());

@@ -4,6 +4,7 @@ import co.com.pragma.model.user.User;
 import co.com.pragma.model.user.gateways.UserRepository;
 import co.com.pragma.r2dbc.RoleReactiveRepository;
 import co.com.pragma.r2dbc.UserReactiveRepository;
+import co.com.pragma.r2dbc.entity.UserEntity;
 import co.com.pragma.r2dbc.mapper.RoleEntityMapper;
 import co.com.pragma.r2dbc.mapper.UserEntityMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,16 @@ public class UserReactiveRepositoryAdapter implements UserRepository {
     public Mono<User> save(User user) {
         return transactionalOperator
                 .execute(status -> repository.save(userEntityMapper.toEntity(user)))
+                .map(UserEntity::getId)
+                .flatMap(repository::findById)
                 .map(userEntityMapper::toDomain)
+                .flatMap(savedUser ->
+                        roleReactiveRepository.findById(savedUser.getRole().getId())
+                                .map(role -> {
+                                    savedUser.setRole(roleEntityMapper.toDomain(role));
+                                    return savedUser;
+                                })
+                )
                 .single();
     }
 

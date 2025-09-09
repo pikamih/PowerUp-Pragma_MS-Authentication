@@ -134,7 +134,6 @@ public class UserController {
         }
 
         return userUseCase.deleteUser(userId)
-                .then(Mono.just(ResponseEntity.ok("Usuario eliminado correctamente")))
-                .onErrorResume(e -> Mono.just(ResponseEntity.status(404).body(e.getMessage())));
+                .then(Mono.just(ResponseEntity.noContent().build()));
     }
 }

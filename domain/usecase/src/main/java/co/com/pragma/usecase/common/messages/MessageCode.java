@@ -1,32 +1,43 @@
 package co.com.pragma.usecase.common.messages;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
 public enum MessageCode {
-// ===== Campos requeridos =====
-    USER_FIRST_NAME_REQUIRED,
-    USER_LAST_NAME_REQUIRED,
-    USER_EMAIL_REQUIRED,
-    USER_DOCUMENT_ID_REQUIRED,
-    USER_BASE_SALARY_REQUIRED,
+    // ===== Required fields =====
+    USER_FIRST_NAME_REQUIRED("u0001", "First name is required.", 400),
+    USER_LAST_NAME_REQUIRED("u0002", "Last name is required.", 400),
+    USER_EMAIL_REQUIRED("u0003", "Email is required.", 400),
+    USER_DOCUMENT_ID_REQUIRED("u0004", "Document ID is required.", 400),
+    USER_BASE_SALARY_REQUIRED("u0005", "Base salary is required.", 400),
 
-// ===== Validaciones de formato / rango =====
-    USER_BASE_SALARY_INVALID,
-    USER_EMAIL_INVALID,
+    ROLE_NAME_REQUIRED("r0001", "Role name is required.", 400),
 
-// ===== Conflictos de unicidad =====
-    USER_EMAIL_ALREADY_EXISTS,
-    USER_DOCUMENT_ID_ALREADY_EXISTS,
+    // ===== Format / range validations =====
+    USER_BASE_SALARY_INVALID("u0006", "Base salary must be between 0 and 15,000,000.", 400),
+    USER_EMAIL_INVALID("u0007", "Invalid email format.", 400),
+    USER_ROLE_REQUIRED("u0008", "Role is required for the user.", 400),
+    USER_INVALID_PASSWORD("u0009", "Incorrect password.", 400),
+    USER_PASSWORD_REQUIRED("u0010", "Password is required.", 400),
+    USER_DOCUMENT_ID_CANNOT_BE_CHANGED("u0011", "Document ID cannot be changed.", 400),
 
-// ===== Recurso no encontrado =====
-    USER_NOT_FOUND_BY_ID,
+    // ===== Uniqueness conflicts =====
+    USER_EMAIL_ALREADY_EXISTS("u0012", "The email {0} is already registered.", 409),
+    USER_DOCUMENT_ID_ALREADY_EXISTS("u0013", "The document ID is already registered.", 409),
+    ROLE_ALREADY_EXISTS("r0002", "Role name already exists.", 409),
 
-    ROLE_NAME_REQUIRED,
-    ROLE_ALREADY_EXISTS,
-    ROLE_NOT_FOUND_BY_ID,
+    // ===== Resource not found =====
+    USER_NOT_FOUND_BY_ID("u0014", "User with ID {0} does not exist.", 404),
+    ROLE_NOT_FOUND_BY_ID("r0003", "Role with ID {0} does not exist.", 404),
+    USER_ROLE_NOT_FOUND("u0015", "Role not found.", 404),
+    USER_NOT_FOUND_BY_EMAIL("u0016", "Email {0} does not exist.", 404),
 
-    USER_PASSWORD_REQUIRED,
-    USER_NOT_FOUND_BY_EMAIL,
-    USER_INVALID_PASSWORD,
-    USER_ROLE_REQUIRED,
-    USER_ROLE_NOT_FOUND,
-    USER_NOT_AUTHORIZED
+    // ===== Unauthorized =====
+    USER_NOT_AUTHORIZED("u0017", "User not authorized.", 401);
+
+    private final String errorCode;
+    private final String message;
+    private final Integer httpStatus;
 }
