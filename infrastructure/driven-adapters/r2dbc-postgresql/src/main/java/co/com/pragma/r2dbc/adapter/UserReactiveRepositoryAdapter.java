@@ -29,8 +29,6 @@ public class UserReactiveRepositoryAdapter implements UserRepository {
     public Mono<User> save(User user) {
         return transactionalOperator
                 .execute(status -> repository.save(userEntityMapper.toEntity(user)))
-                .map(UserEntity::getId)
-                .flatMap(repository::findById)
                 .map(userEntityMapper::toDomain)
                 .flatMap(savedUser ->
                         roleReactiveRepository.findById(savedUser.getRole().getId())
@@ -39,6 +37,7 @@ public class UserReactiveRepositoryAdapter implements UserRepository {
                                     return savedUser;
                                 })
                 )
+                .doOnError(err -> System.err.println("Error en save: " + err.getMessage()))
                 .single();
     }
 

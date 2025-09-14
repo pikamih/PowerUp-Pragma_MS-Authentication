@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
         HttpStatus status =
-                HttpStatus.valueOf(ex.getCode().getHttpStatus());
+                HttpStatus.valueOf(ex.getCode().getStatusCode());
 
         // Traduce el mensaje con parámetros
         String message = translator.translate(ex.getCode(), ex.getParams());

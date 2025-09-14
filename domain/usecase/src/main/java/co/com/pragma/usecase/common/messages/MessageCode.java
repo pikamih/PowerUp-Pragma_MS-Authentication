@@ -39,5 +39,5 @@ public enum MessageCode {
 
     private final String errorCode;
     private final String message;
-    private final Integer httpStatus;
+    private final Integer statusCode;
 }

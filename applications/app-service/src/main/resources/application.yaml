@@ -47,6 +47,12 @@ security:
     public-key-path: ${JWT_PRAGMA_PUBLIC_KEY_PATH}
     expiration: 3600 #en segundos
 
+app:
+  initial:
+    admin:
+      email: ${APP_INITIAL_ADMIN_EMAIL}
+      password: ${APP_INITIAL_ADMIN_PASSWORD}
+
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
 

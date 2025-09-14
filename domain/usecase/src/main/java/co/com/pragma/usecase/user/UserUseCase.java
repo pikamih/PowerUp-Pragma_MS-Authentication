@@ -72,8 +72,6 @@ public class UserUseCase {
                                     if (docExists) {
                                         return Mono.error(new BusinessException(MessageCode.USER_DOCUMENT_ID_ALREADY_EXISTS, new Object[]{}));
                                     }
-
-                                    System.out.println("passwordd: " + user);
                                     String hashedPassword = passwordHasher.hash(user.getPassword());
                                     user.setPassword(hashedPassword);
                                     // Asignar el rol validado al usuario antes de guardar
