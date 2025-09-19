@@ -32,10 +32,9 @@ public class UserHandler {
                 .contentType(APPLICATION_JSON).bodyValue(userWebMapper.toResponse(savedUser)));
     }
 
-    public Mono<ServerResponse> getUserById(ServerRequest request) {
+    public Mono<ServerResponse> getUserByDocumentId(ServerRequest request) {
         try {
-            UUID userId = UUID.fromString(request.pathVariable("id"));
-            return userUseCase.getUserById(userId).flatMap(user -> ServerResponse.ok()
+            return userUseCase.getUserByDocumentId(request.pathVariable("id")).flatMap(user -> ServerResponse.ok()
                     .contentType(APPLICATION_JSON).bodyValue(userWebMapper.toResponse(user)));
         } catch (IllegalArgumentException e) {
             return ServerResponse.badRequest().bodyValue("Invalid UUID format: " + request.pathVariable("id"));

@@ -87,6 +87,11 @@ public class UserUseCase {
                 .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{id})));
     }
 
+    public Mono<User> getUserByDocumentId(String documentId) {
+        return userRepository.findByDocumentId(documentId)
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.USER_NOT_FOUND_BY_ID, new Object[]{documentId})));
+    }
+
     public Flux<User> listUsers() {
         return userRepository.findAll();
     }

@@ -12,6 +12,7 @@ public interface UserRepository {
     Mono<Boolean> existsByEmail(String email);
     Mono<Boolean> existsByDocumentId(String documentId);
     Mono<User> findById(UUID id);
+    Mono<User> findByDocumentId(String documentId);
     Flux<User> findAll();
     Mono<User> findByEmail(String email);
 }

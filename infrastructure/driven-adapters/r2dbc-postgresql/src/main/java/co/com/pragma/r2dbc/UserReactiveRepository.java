@@ -11,5 +11,6 @@ public interface UserReactiveRepository extends ReactiveCrudRepository<UserEntit
         ReactiveQueryByExampleExecutor<UserEntity> {
 
     Mono<UserEntity> findByEmail(String email);
+    Mono<UserEntity> findByDocumentId(String documentId);
     Mono<Boolean> existsByDocumentId(String documentId);
 }

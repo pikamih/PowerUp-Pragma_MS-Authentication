@@ -66,10 +66,10 @@ public class UserController {
                 .map(userWebMapper::toResponse);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{documentId}")
     @Operation(
-            summary = "Obtener usuario por ID",
-            description = "Devuelve un usuario específico según su ID",
+            summary = "Obtener usuario por documentId",
+            description = "Devuelve un usuario específico según su documentId",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuario encontrado",
                             content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
@@ -78,14 +78,8 @@ public class UserController {
             }
     )
     @SecurityRequirement(name = "bearerAuth")
-    public Mono<UserResponseDto> getUserById(@PathVariable("id") String id) {
-        UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            return Mono.error(new IllegalArgumentException("Invalid UUID format"));
-        }
-        return userUseCase.getUserById(userId)
+    public Mono<UserResponseDto> getUserByDocumentId(@PathVariable("documentId") String documentId) {
+        return userUseCase.getUserByDocumentId(documentId)
                 .map(userWebMapper::toResponse);
     }
 

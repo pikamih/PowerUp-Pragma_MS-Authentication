@@ -59,6 +59,19 @@ public class UserReactiveRepositoryAdapter implements UserRepository {
                 );
     }
 
+    @Override
+    public Mono<User> findByDocumentId(String documentId) {
+        return repository.findByDocumentId(documentId)
+                .flatMap(userEntity ->
+                        roleReactiveRepository.findById(userEntity.getRoleId())
+                                .map(roleEntity -> {
+                                    User user = userEntityMapper.toDomain(userEntity);
+                                    user.setRole(roleEntityMapper.toDomain(roleEntity)); // map RoleEntity → Role
+                                    return user;
+                                })
+                );
+    }
+
 
 
     @Override

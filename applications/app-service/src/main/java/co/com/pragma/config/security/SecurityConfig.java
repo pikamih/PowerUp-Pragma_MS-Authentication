@@ -32,7 +32,7 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
-                        .pathMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ASESOR")
+                        .pathMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "ASESOR", "CLIENTE")
                         .pathMatchers("/api/v1/roles/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
