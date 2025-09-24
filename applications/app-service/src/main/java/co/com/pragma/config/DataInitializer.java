@@ -4,7 +4,6 @@ import co.com.pragma.model.role.Role;
 import co.com.pragma.model.user.User;
 import co.com.pragma.usecase.role.RoleUseCase;
 import co.com.pragma.usecase.user.UserUseCase;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class DataInitializer implements ApplicationListener<ApplicationReadyEvent> {

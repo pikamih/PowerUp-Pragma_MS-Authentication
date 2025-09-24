@@ -4,7 +4,6 @@ import co.com.pragma.model.user.User;
 import co.com.pragma.model.user.gateways.UserRepository;
 import co.com.pragma.r2dbc.RoleReactiveRepository;
 import co.com.pragma.r2dbc.UserReactiveRepository;
-import co.com.pragma.r2dbc.entity.UserEntity;
 import co.com.pragma.r2dbc.mapper.RoleEntityMapper;
 import co.com.pragma.r2dbc.mapper.UserEntityMapper;
 import lombok.RequiredArgsConstructor;

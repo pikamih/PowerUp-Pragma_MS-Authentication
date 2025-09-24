@@ -3,13 +3,11 @@ package co.com.pragma.api.handler;
 import co.com.pragma.api.dto.request.RoleRequestDto;
 import co.com.pragma.api.mapper.RoleWebMapper;
 import co.com.pragma.usecase.role.RoleUseCase;
-import co.com.pragma.model.role.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
 
 import java.net.URI;
 import java.util.UUID;

@@ -1,7 +1,6 @@
 package co.com.pragma.api.handler;
 
 import co.com.pragma.api.dto.request.UserRequestDto;
-import co.com.pragma.api.dto.response.UserResponseDto;
 import co.com.pragma.api.mapper.UserWebMapper;
 import co.com.pragma.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;

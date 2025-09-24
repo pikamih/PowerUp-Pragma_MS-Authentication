@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/auths")
 @RequiredArgsConstructor
 @Tag(name = "Autenticación", description = "Operaciones relacionadas con el login y autenticación de usuarios")
 public class AuthController {

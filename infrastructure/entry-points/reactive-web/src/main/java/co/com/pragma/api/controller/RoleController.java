@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/roles")
+@RequestMapping("/api/v1/auths/roles")
 @RequiredArgsConstructor
 @Tag(name = "Roles", description = "Operaciones relacionadas con la gestión de roles")
 public class RoleController {

@@ -19,7 +19,6 @@ public enum MessageCode {
     USER_BASE_SALARY_INVALID("u0006", "Base salary must be between 0 and 15,000,000.", 400),
     USER_EMAIL_INVALID("u0007", "Invalid email format.", 400),
     USER_ROLE_REQUIRED("u0008", "Role is required for the user.", 400),
-    USER_INVALID_PASSWORD("u0009", "Incorrect password.", 400),
     USER_PASSWORD_REQUIRED("u0010", "Password is required.", 400),
     USER_DOCUMENT_ID_CANNOT_BE_CHANGED("u0011", "Document ID cannot be changed.", 400),
 
@@ -32,7 +31,7 @@ public enum MessageCode {
     USER_NOT_FOUND_BY_ID("u0014", "User with ID {0} does not exist.", 404),
     ROLE_NOT_FOUND_BY_ID("r0003", "Role with ID {0} does not exist.", 404),
     USER_ROLE_NOT_FOUND("u0015", "Role not found.", 404),
-    USER_NOT_FOUND_BY_EMAIL("u0016", "Email {0} does not exist.", 404),
+    CREDENTIAL_NOT_FOUNDL("u0016", "The credentials entered are not correct.", 404),
 
     // ===== Unauthorized =====
     USER_NOT_AUTHORIZED("u0017", "User not authorized.", 401);

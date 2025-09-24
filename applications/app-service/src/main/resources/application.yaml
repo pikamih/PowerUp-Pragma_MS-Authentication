@@ -4,11 +4,12 @@ server:
 spring:
   application:
     name: "MS_Authentication"
-
+  profiles:
+    active: "devkpika"
   r2dbc:
-    url: ${R2DBC_DB_AUTH}
-    username: postgres
-    password: root
+    url: "${SPRING_DATASOURCE_URL}"
+    username: "${SPRING_DATASOURCE_USERNAME}"
+    password: "${SPRING_DATASOURCE_PASSWORD}"
     pool:
       initial-size: 5
       max-size: 20
@@ -43,8 +44,8 @@ springdoc:
 
 security:
   jwt:
-    private-key-path: ${JWT_PRAGMA_PRIVATE_KEY_PATH}
-    public-key-path: ${JWT_PRAGMA_PUBLIC_KEY_PATH}
+    private-key-path: ${JWT_PRAGMA_PRIVATE_KEY}
+    public-key-path: ${JWT_PRAGMA_PUBLIC_KEY}
     expiration: 3600 #en segundos
 
 app:

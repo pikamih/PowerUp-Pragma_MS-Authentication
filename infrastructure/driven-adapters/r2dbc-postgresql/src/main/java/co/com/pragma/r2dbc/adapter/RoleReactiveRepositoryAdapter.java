@@ -2,13 +2,9 @@ package co.com.pragma.r2dbc.adapter;
 
 import co.com.pragma.model.role.Role;
 import co.com.pragma.model.role.gateways.RoleRepository;
-import co.com.pragma.r2dbc.entity.RoleEntity;
-import co.com.pragma.r2dbc.helper.ReactiveAdapterOperations;
 import co.com.pragma.r2dbc.mapper.RoleEntityMapper;
 import co.com.pragma.r2dbc.RoleReactiveRepository;
 import lombok.RequiredArgsConstructor;
-import org.reactivecommons.utils.ObjectMapper;
-import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;

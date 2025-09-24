@@ -22,7 +22,7 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auths/users")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Usuarios", description = "Operaciones relacionadas con la gestión de usuarios")
@@ -73,7 +73,7 @@ public class UserController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Usuario encontrado",
                             content = @Content(schema = @Schema(implementation = UserResponseDto.class))),
-                    @ApiResponse(responseCode = "400", description = "UUID inválido", content = @Content()),
+                    @ApiResponse(responseCode = "400", description = "documentID inválido", content = @Content()),
                     @ApiResponse(responseCode = "404", description = "Usuario no encontrado", content = @Content())
             }
     )

@@ -5,13 +5,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Date;
@@ -28,8 +25,8 @@ public class JwtService {
             @Value("${security.jwt.public-key-path}") String publicKey,
             @Value("${security.jwt.expiration}") long expirationSeconds
     ) throws Exception {
-        this.privateKey = PemKeys.readPrivateKey(privateKey);
-        this.publicKey = PemKeys.readPublicKey(publicKey);
+        this.privateKey = PemKeys.readPrivateKeyFromString(privateKey);
+        this.publicKey = PemKeys.readPublicKeyFromString(publicKey);
         this.expirationMillis = expirationSeconds * 1000;
     }
 

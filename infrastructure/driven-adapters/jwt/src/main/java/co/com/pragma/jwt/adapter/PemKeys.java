@@ -28,4 +28,25 @@ public final class PemKeys {
         byte[] der = Base64.getDecoder().decode(content);
         return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
     }
+
+    // ---- NUEVOS métodos que leen directamente desde un string ----
+    public static PrivateKey readPrivateKeyFromString(String pem) throws Exception {
+        String content = pem
+                .replace("\\n", "\n")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] der = Base64.getDecoder().decode(content);
+        return KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(der));
+    }
+
+    public static PublicKey readPublicKeyFromString(String pem) throws Exception {
+        String content = pem
+                .replace("\\n", "\n")
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] der = Base64.getDecoder().decode(content);
+        return KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(der));
+    }
 }

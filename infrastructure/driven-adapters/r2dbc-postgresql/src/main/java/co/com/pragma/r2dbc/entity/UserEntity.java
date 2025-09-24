@@ -1,6 +1,5 @@
 package co.com.pragma.r2dbc.entity;
 
-import co.com.pragma.model.role.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
