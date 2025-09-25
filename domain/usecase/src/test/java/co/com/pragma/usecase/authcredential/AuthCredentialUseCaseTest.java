@@ -83,7 +83,7 @@ class AuthCredentialUseCaseTest {
         StepVerifier.create(useCase.validateCredentials(credential))
                 .expectErrorSatisfies(e -> {
                     assert e instanceof BusinessException;
-                    assert ((BusinessException) e).getMessageCode().name().equals("USER_NOT_FOUND_BY_EMAIL");
+                    assert ((BusinessException) e).getMessageCode().name().equals("CREDENTIAL_NOT_FOUND");
                 })
                 .verify();
     }
@@ -99,7 +99,7 @@ class AuthCredentialUseCaseTest {
         StepVerifier.create(useCase.validateCredentials(credential))
                 .expectErrorSatisfies(e -> {
                     assert e instanceof BusinessException;
-                    assert ((BusinessException) e).getMessageCode().name().equals("USER_INVALID_PASSWORD");
+                    assert ((BusinessException) e).getMessageCode().name().equals("CREDENTIAL_NOT_FOUND");
                 })
                 .verify();
     }

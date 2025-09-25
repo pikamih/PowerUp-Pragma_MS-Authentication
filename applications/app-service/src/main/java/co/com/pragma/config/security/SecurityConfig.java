@@ -32,7 +32,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .pathMatchers("/actuator/health").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/auths/login").permitAll()
-                        .pathMatchers("/api/v1/auths/users/**").hasAnyRole("ADMIN", "ASESOR")
+                        .pathMatchers("/api/v1/auths/users/**").hasAnyRole("ADMIN", "ASESOR", "CLIENTE")
                         .pathMatchers("/api/v1/auths/roles/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )

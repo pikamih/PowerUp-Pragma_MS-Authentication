@@ -14,10 +14,10 @@ public class UserRouter {
 
     @Bean
     public RouterFunction<ServerResponse> userRoutes(UserHandler handler) {
-        return route(POST("//api/v1/users"), handler::createUser)
-                .andRoute(GET("/api/v1/users/{id}"), handler::getUserByDocumentId)
-                .andRoute(GET("/api/v1/users"), handler::listUsers)
-                .andRoute(PUT("//api/v1/users/{id}"), handler::updateUser)
-                .andRoute(DELETE("/api/v1/users/{id}"), handler::deleteUser);
+        return route(POST("/api/v1/auths/users"), handler::createUser)
+                .andRoute(GET("/api/v1/auths/users/{id}"), handler::getUserByDocumentId)
+                .andRoute(GET("/api/v1/auths/users"), handler::listUsers)
+                .andRoute(PUT("/api/v1/auths/users/{id}"), handler::updateUser)
+                .andRoute(DELETE("/api/v1/auths/users/{id}"), handler::deleteUser);
     }
 }

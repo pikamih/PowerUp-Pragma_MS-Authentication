@@ -31,7 +31,7 @@ public enum MessageCode {
     USER_NOT_FOUND_BY_ID("u0014", "User with ID {0} does not exist.", 404),
     ROLE_NOT_FOUND_BY_ID("r0003", "Role with ID {0} does not exist.", 404),
     USER_ROLE_NOT_FOUND("u0015", "Role not found.", 404),
-    CREDENTIAL_NOT_FOUNDL("u0016", "The credentials entered are not correct.", 404),
+    CREDENTIAL_NOT_FOUND("u0016", "The credentials entered are not correct.", 404),
 
     // ===== Unauthorized =====
     USER_NOT_AUTHORIZED("u0017", "User not authorized.", 401);

@@ -13,7 +13,7 @@ public class AuthRouter {
     @Bean
     public RouterFunction<ServerResponse> authRoutes(AuthHandler authHandler) {
         return RouterFunctions.route()
-                .POST("/api/v1/auth", authHandler::login)
+                .POST("/api/v1/auths/auth", authHandler::login)
                 .build();
     }
 }

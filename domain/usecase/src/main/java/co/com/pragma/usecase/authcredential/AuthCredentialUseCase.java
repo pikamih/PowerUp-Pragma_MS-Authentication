@@ -26,10 +26,10 @@ public class AuthCredentialUseCase {
         }
 
         return userRepository.findByEmail(credential.getEmail())
-                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.CREDENTIAL_NOT_FOUNDL, new Object[]{credential.getEmail()})))
+                .switchIfEmpty(Mono.error(new BusinessException(MessageCode.CREDENTIAL_NOT_FOUND, new Object[]{})))
                 .flatMap(user -> {
                     if (!passwordHasher.verify(credential.getPassword(), user.getPassword())) {
-                        return Mono.error(new BusinessException(MessageCode.CREDENTIAL_NOT_FOUNDL, new Object[]{}));
+                        return Mono.error(new BusinessException(MessageCode.CREDENTIAL_NOT_FOUND, new Object[]{}));
                     }
 
                     // Cargar Role completo usando el UUID
